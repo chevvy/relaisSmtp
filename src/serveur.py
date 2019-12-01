@@ -107,6 +107,8 @@ def verifier_validite_nouveau_compte(nom_utilisateur, mot_de_passe):
 
 
 def verifier_validite_compte_existant(nom_utilisateur, mot_de_passe):
+    if nom_utilisateur == "":
+        return "Connexion échouée : Le nom d'usager ne peut pas être vide"
     if nom_utilisateur in liste_utilisateurs():
         mot_de_passe_hache = sha256(mot_de_passe.encode()).hexdigest()
         with open(os.getcwd() + '/' + nom_utilisateur + '/' + 'config.txt') as f:
