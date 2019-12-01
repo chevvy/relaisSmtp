@@ -1,6 +1,5 @@
 import smtplib
 from email.mime.text import MIMEText
-import re
 import getpass
 
 
@@ -23,12 +22,12 @@ def envoi_courriel(expediteur, destinataire, sujet, text):
         smtp_connection.quit()
         print("Message envoye")
     except:
-        print("L’envoi n’a pas pu etre effectue. ")
+        print("L’envoi n’a pas pu etre effectué. ")
 
 
 def choix_de_laction():
     print("Menu de connexion")
-    print("1. Creer un compte")
+    print("1. Créer un compte")
     print("2. Se connecter")
     choix = input()
     return choix
