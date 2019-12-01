@@ -103,12 +103,3 @@ if __name__ == "__main__":
     if action == 2:
         connection_utilisateur()
 
-    return True, "ok"
-
-
-if __name__ == "__main__":
-    action = int(choix_de_laction())
-    if action == 1:
-        nouveau_compte()
-    if action == 2:
-        connection_utilisateur()
