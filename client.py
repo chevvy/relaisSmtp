@@ -1,4 +1,5 @@
 import re
+import getpass
 
 def choix_de_laction():
     print("Menu de connexion")
@@ -10,32 +11,25 @@ def choix_de_laction():
 def nouveau_compte():
     print("Menu creation de compte")
     print("Entrez un nom d'usager")
-    nomUsager = input()
-    print("Entrez un mot de passe")
-    motDePasse = input()
-    ##valide = verifierValiditeNouveauCompte(nomUsager, motDePasse)
+    nom_usager = input()
+    mdp_valide = False
+    while not mdp_valide:
+        print("Entrez un mot de passe")
+        mot_de_passe = getpass.getpass(prompt='Mot de passe: ', stream=None)
+        mdp_valide = (mdp_est_conforme(mot_de_passe))[0]
+        if not mdp_valide:
+            print((mdp_est_conforme(mot_de_passe))[1])
+
+    ##creationValide = verifierValiditeNouveauCompte(nomUsager, motDePasse)
 
 
 def connection_utilisateur():
     print("Connexion de l'utilisateur")
     print("Entrez votre nom d'usager")
-    nomUsager = input()
-    ##print("Entrez votre mot de passe")
-    ##motDePasse = input()
-    ##valide = verifierValiditeCompteExistant(nomUsager, motDePasse)
-    ##if valide :
-
-
-
-
-
-if __name__ == "__main__":
-    action = int(choix_de_laction())
-    if action == 1:
-        nouveau_compte()
-
-    if action == 2:
-        connection_utilisateur()
+    nom_usager = input()
+    print("Entrez votre mot de passe")
+    mot_de_passe = input()
+    ##connectionValide = verifierValiditeCompteExistant(nomUsager, motDePasse)
 
 
 def mdp_est_conforme(mdp):
@@ -49,4 +43,13 @@ def mdp_est_conforme(mdp):
         return False, "Le mot de passe doit contenir au moins une lettre majuscule."
     if not re.search(r"[a-z]", mdp):
         return False, "Le mot de passe doit contenir au moins une lettre minuscule."
-    return True, "ok"
+    return True, ""
+
+
+if __name__ == "__main__":
+    action = int(choix_de_laction())
+    if action == 1:
+        nouveau_compte()
+
+    if action == 2:
+        connection_utilisateur()
