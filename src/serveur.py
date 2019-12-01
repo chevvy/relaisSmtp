@@ -56,18 +56,18 @@ def initialisation_serveur():
         # TODO vérification de la validité des login des utilisateurs
         login_info = s.recv(1024).decode()
         print(login_info)
+        user_et_mdp = login_info.split(" ")
+        print(user_et_mdp)
         if mode_action == "creation":
-            user_et_mdp = login_info.split(" ")
-            print(user_et_mdp)
             validation = verifier_validite_nouveau_compte(user_et_mdp[0], user_et_mdp[1])
-            serversocket.send(conversion_string_to_byte(validation))
 
         if mode_action == "connexion":
-            print("connexion")
-        # message de bienvenue
-        msg = "True"  # la connexion est reussi
-        s.send(msg.encode())  # à ce moment le client va afficher le
+            validation = verifier_validite_compte_existant(user_et_mdp[0], user_et_mdp[1])
 
+
+        # message de bienvenue
+        msg = "True" + "/" + validation  # la connexion est reussi
+        s.send(msg.encode())  # à ce moment le client va afficher le
 
 def creation_du_courriel():
     courriel = MIMEText("Ce courriel a ete envoye par mon serveur de courriel")

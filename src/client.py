@@ -59,22 +59,11 @@ class Client(ObjetReseau):
         login_info = self.connection_utilisateur()
         self.socket.send(self.conversion_string_to_byte(login_info))
 
-        # self.socket.listen(5)
-        # while True:
-        #     # un client se connecte au serveur
-        #     # s est un nouveau socket pour interagir avec le client
-        #     (s, address) = self.socket.accept()
-        #     # affichage du nombre de connection au serveur
-        #
-        #     # Reception des logins
-        #     mode_action = self.socket.recv(1024).decode()
-        #     print(mode_action)
-        #
-        #     # TODO vérification de la validité des login des utilisateurs
-        #     login_info = s.recv(1024).decode()
-        #     print(login_info)
-
-        # recepetion et assignation de la base
+        while True:
+            mode_action = self.socket.recv(1024).decode()
+            if not mode_action:
+                break
+            print(mode_action)
 
 
         self.socket.close()
@@ -88,7 +77,10 @@ class Client(ObjetReseau):
 
 
     def connection_utilisateur(self):
-        print("Connexion de l'utilisateur")
+        if action == 1:
+            print("Création d'un compte")
+        if action == 2:
+            print("Connection à un compte")
         print("Entrez votre nom d'usager")
         nom_usager = input()
         print("Entrez votre mot de passe")
