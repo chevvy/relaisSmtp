@@ -1,3 +1,4 @@
+# coding=utf-8
 import smtplib
 from email.mime.text import MIMEText
 import socket
@@ -57,12 +58,15 @@ class Client(ObjetReseau):
         # reception et assignation des clées
         self.socket.send(self.conversion_string_to_byte(type_execution))
         if type_execution == "creation":
+            login_info = nouveau_compte()
+
+
             self.socket.connect(info_connexion_serveur)
             client = Client("127.0.0.1", 1400)
             client.nouveau_compte()
             self.socket.send(self.conversion_string_to_byte())
         if type_execution == "connexion":
-            connection_utilisateur()
+            login_info = connection_utilisateur()
 
         # recepetion et assignation de la base
 
@@ -91,8 +95,10 @@ def nouveau_compte():
     print("Entrez un nom d'usager")
     nom_usager = input()
     print("Entrez un mot de passe")
-    mot_de_passe = input()
+    mot_de_passe = getpass.getpass(prompt='Mot de passe: ', stream=None)
     return nom_usager, mot_de_passe
+
+    ##creationValide = verifierValiditeNouveauCompte(nomUsager, motDePasse)
 
 
 def connection_utilisateur():
@@ -101,6 +107,8 @@ def connection_utilisateur():
     nom_usager = input()
     print("Entrez votre mot de passe")
     mot_de_passe = input()
+
+    return nom_usager, mot_de_passe
     ##connectionValide = verifierValiditeCompteExistant(nomUsager, motDePasse)
 
 
@@ -123,9 +131,13 @@ def menu_principal():
             quitter = True
 
 if __name__ == "__main__":
+
     action = int(choix_de_laction())
     if action == 1:
-        pass
+        client = Client("127.0.0.1", 1400)
+        client.execution_client_courriel("creation")
+
     if action == 2:
-        connection_utilisateur()
+        client = Client("127.0.0.1", 1400)
+        client.execution_client_courriel("connexion")
 
