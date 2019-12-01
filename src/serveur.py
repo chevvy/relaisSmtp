@@ -57,7 +57,7 @@ def initialisation_serveur():
             msg = "Le courriel a bien ete envoye! "
             s.send(msg.encode())
         except:
-            msg = "L’envoi n’a pas pu etre effectué. "
+            msg = "L'envoi n’a pas pu etre effectué. "
             s.send(msg.encode())
 
         msg = "Au revoir!\n"
@@ -89,6 +89,8 @@ def liste_utilisateurs():
     return utilisateurs
 
 def mdp_est_conforme(mdp):
+    if re.search(r" ", mdp):
+        return False, "Le mot de passe ne doit pas contenir d'espace."
     if not re.search(r".{6}", mdp) or re.search(r".{13}", mdp):
         return False, "Le mot de passe doit contenir entre 6 et 12 caractères."
     if not re.search(r".*\d.*\d.*", mdp):
