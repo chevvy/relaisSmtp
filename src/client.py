@@ -1,3 +1,4 @@
+# coding=utf-8
 import smtplib
 from email.mime.text import MIMEText
 import socket
@@ -57,9 +58,11 @@ class Client(ObjetReseau):
         # reception et assignation des clées
         self.socket.send(self.conversion_string_to_byte(type_execution))
         if type_execution == "creation":
-            nouveau_compte()
+            login_info = nouveau_compte()
+
+
         if type_execution == "connexion":
-            connection_utilisateur()
+            login_info = connection_utilisateur()
 
         # recepetion et assignation de la base
 
@@ -87,13 +90,9 @@ def nouveau_compte():
     print("Menu creation de compte")
     print("Entrez un nom d'usager")
     nom_usager = input()
-    mdp_valide = False
-    while not mdp_valide:
-        print("Entrez un mot de passe")
-        mot_de_passe = getpass.getpass(prompt='Mot de passe: ', stream=None)
-        mdp_valide = (mdp_est_conforme(mot_de_passe))[0]
-        if not mdp_valide:
-            print((mdp_est_conforme(mot_de_passe))[1])
+    print("Entrez un mot de passe")
+    mot_de_passe = getpass.getpass(prompt='Mot de passe: ', stream=None)
+    return nom_usager, mot_de_passe
 
     ##creationValide = verifierValiditeNouveauCompte(nomUsager, motDePasse)
 
@@ -106,7 +105,7 @@ def connection_utilisateur():
     mot_de_passe = input()
     ##connectionValide = verifierValiditeCompteExistant(nomUsager, motDePasse)
     client = Client("127.0.0.1", 1400)
-    client.execution_client_courriel()
+    client.execution_client_courriel("connexion")
 
 
 def menu_principal():
@@ -142,10 +141,13 @@ def mdp_est_conforme(mdp):
     return True, ""
 
 
+
 if __name__ == "__main__":
+
     action = int(choix_de_laction())
     if action == 1:
-        nouveau_compte()
+        client = Client("127.0.0.1", 1400)
+        client.execution_client_courriel("connexion")
 
     if action == 2:
         connection_utilisateur()
