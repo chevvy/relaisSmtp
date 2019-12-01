@@ -5,6 +5,26 @@ from hashlib import sha256
 from email.mime.text import MIMEText
 
 
+def conversion_byte_to_string(byte_a_convertir, encodage="utf-8"):
+    """
+    Converti un byte reçu en argument vers un string et le retourne
+    :param encodage: l'encodage (par défaut UTF-8)
+    :param byte_a_convertir: un string de character ou chiffre
+    :return: string: le string converti
+    """
+    string_converti = byte_a_convertir.decode(encodage)
+    return string_converti
+
+
+def conversion_string_to_byte(element_a_convertir, encodage="utf-8"):
+    """
+    Converti un string en byte, encoder dans un encodage spécifique (par défaut = UTF-8)
+    :param encodage:
+    :param element_a_convertir:
+    :return:
+    """
+    string = str(element_a_convertir)
+    return str.encode(string, encodage)
 
 
 def initialisation_serveur():
@@ -20,7 +40,7 @@ def initialisation_serveur():
     # demarre le socket
     serversocket.listen(5)
     print("Listening on port " + str(serversocket.getsockname()[1]))
-    i=0
+    i = 0
     while True:
         # un client se connecte au serveur
         # s est un nouveau socket pour interagir avec le client
@@ -29,40 +49,47 @@ def initialisation_serveur():
         i += 1
         print(str(i) + "e connexion au serveur")
 
-
         # Reception des logins
         mode_action = s.recv(1024).decode()
-        if mode_action == "creation":
-            print("creation")
-        if mode_action == "connexion":
-            print("connexion")
+        print(mode_action)
 
         # TODO vérification de la validité des login des utilisateurs
+        login_info = s.recv(1024).decode()
+        print(login_info)
+        if mode_action == "creation":
+            user_et_mdp = login_info.split(" ")
+            print(user_et_mdp)
+            validation = verifier_validite_nouveau_compte(user_et_mdp[0], user_et_mdp[1])
+            serversocket.send(conversion_string_to_byte(validation))
 
+        if mode_action == "connexion":
+            print("connexion")
         # message de bienvenue
         msg = "True"  # la connexion est reussi
         s.send(msg.encode())  # à ce moment le client va afficher le
 
-        # creation du courriel
-        courriel = MIMEText("Ce courriel a ete envoye par mon serveur de courriel")
-        courriel["From"] = "exercice3@glo2000.ca"
-        courriel["To"] = "adresse to"
-        courriel["Subject"] = "Exercice3"
 
-        # envoi du courriel
-        try:
-            smtp_connection = smtplib.SMTP(host="smtp.ulaval.ca", timeout=10)
-            smtp_connection.sendmail(courriel["From"], courriel["To"], courriel.as_string())
-            smtp_connection.quit()
-            msg = "Le courriel a bien ete envoye! "
-            s.send(msg.encode())
-        except:
-            msg = "L’envoi n’a pas pu etre effectué. "
-            s.send(msg.encode())
+def creation_du_courriel():
+    courriel = MIMEText("Ce courriel a ete envoye par mon serveur de courriel")
+    courriel["From"] = "exercice3@glo2000.ca"
+    courriel["To"] = "adresse to"
+    courriel["Subject"] = "Exercice3"
 
+
+def envoie_du_courriel(courriel, s):
+    try:
+        smtp_connection = smtplib.SMTP(host="smtp.ulaval.ca", timeout=10)
+        smtp_connection.sendmail(courriel["From"], courriel["To"], courriel.as_string())
+        smtp_connection.quit()
+        msg = "Le courriel a bien ete envoye! "
+        s.send(msg.encode())
+    except:
+        msg = "L’envoi n’a pas pu etre effectué. "
+        s.send(msg.encode())
         msg = "Au revoir!\n"
         s.send(msg.encode())
         s.close()
+
 
 # def fonction pour vérifier courriels valide (si nécessaire)
 #         while not re.search(r"^[^@]+@[^@]+\.[^@]+$", email_address):

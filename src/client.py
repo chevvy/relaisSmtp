@@ -54,19 +54,25 @@ class Client(ObjetReseau):
         info_connexion_serveur = (self.ip, self.port)
         self.socket.connect(info_connexion_serveur)
 
-        connection_utilisateur()
         # reception et assignation des clées
         self.socket.send(self.conversion_string_to_byte(type_execution))
-        if type_execution == "creation":
-            login_info = nouveau_compte()
+        login_info = connection_utilisateur()
+        self.socket.send(self.conversion_string_to_byte(login_info))
 
+        self.socket.listen(5)
+        while True:
+            # un client se connecte au serveur
+            # s est un nouveau socket pour interagir avec le client
+            (s, address) = self.socket.accept()
+            # affichage du nombre de connection au serveur
 
-            self.socket.connect(info_connexion_serveur)
-            client = Client("127.0.0.1", 1400)
-            client.nouveau_compte()
-            self.socket.send(self.conversion_string_to_byte())
-        if type_execution == "connexion":
-            login_info = connection_utilisateur()
+            # Reception des logins
+            mode_action = self.socket.recv(1024).decode()
+            print(mode_action)
+
+            # TODO vérification de la validité des login des utilisateurs
+            login_info = s.recv(1024).decode()
+            print(login_info)
 
         # recepetion et assignation de la base
 
@@ -90,26 +96,13 @@ def courriel_test():
     envoi_courriel("sirpat@hotmail.com", "vincentcjobin@gmail.com")
 
 
-def nouveau_compte():
-    print("Menu creation de compte")
-    print("Entrez un nom d'usager")
-    nom_usager = input()
-    print("Entrez un mot de passe")
-    mot_de_passe = getpass.getpass(prompt='Mot de passe: ', stream=None)
-    return nom_usager, mot_de_passe
-
-    ##creationValide = verifierValiditeNouveauCompte(nomUsager, motDePasse)
-
-
 def connection_utilisateur():
     print("Connexion de l'utilisateur")
     print("Entrez votre nom d'usager")
     nom_usager = input()
     print("Entrez votre mot de passe")
     mot_de_passe = input()
-
-    return nom_usager, mot_de_passe
-    ##connectionValide = verifierValiditeCompteExistant(nomUsager, motDePasse)
+    return nom_usager + ' ' + mot_de_passe
 
 
 def menu_principal():
