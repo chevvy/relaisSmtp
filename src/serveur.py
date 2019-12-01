@@ -58,16 +58,25 @@ def initialisation_serveur():
         s.send(msg.encode())
         s.close()
 
-def liste_courriels(path):
-    (_, _, courriels) = next(os.walk(os.getcwd() + "/" + path))
-    return courriels
+def liste_courriels(utilisateur):
+    (_, _, courriels) = next(os.walk(os.getcwd() + "/" + utilisateur))
+    courriels_formates = ""
+    compte = 1
+    for courriel in courriels:
+        courriels_formates += str(compte) + ". " + courriel[:-4] + "\n"
+        compte += 1
+    return courriels_formates
 
-def liste_utlisateurs():
+
+def liste_utilisateurs():
     (_, utilisateurs, _) = next(os.walk(os.getcwd()))
     return utilisateurs
 
+def statistiques(utilisateur):
+    pass
+
 if __name__ == "__main__":
-    print(liste_utlisateurs())
+    print(liste_courriels("XxX_L3OK1LL3R_XxX"))
     initialisation_serveur()
 
 ##def verifierValiditeNouveauCompte():
