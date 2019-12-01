@@ -7,7 +7,6 @@ from email.mime.text import MIMEText
 
 
 
-
 def initialisation_serveur():
     # choisissez le port avec l’option -p
     parser = optparse.OptionParser()
@@ -62,8 +61,11 @@ def initialisation_serveur():
 
 def liste_courriels(path):
     (_, _, courriels) = next(os.walk(os.getcwd() + "/" + path))
-    print(courriels)
+    return courriels
 
+def liste_utlisateurs():
+    (_, utilisateurs, _) = next(os.walk(os.getcwd()))
+    return utilisateurs
 
 def mdp_est_conforme(mdp):
     if re.search(r"\s", mdp):
@@ -93,6 +95,7 @@ def verifier_validite_compte_existant():
 
 
 if __name__ == "__main__":
+    print(liste_utlisateurs())
     initialisation_serveur()
 
 ##def verifierValiditeNouveauCompte():
