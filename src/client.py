@@ -42,13 +42,8 @@ def nouveau_compte():
     print("Menu creation de compte")
     print("Entrez un nom d'usager")
     nom_usager = input()
-    mdp_valide = False
-    while not mdp_valide:
-        print("Entrez un mot de passe")
-        mot_de_passe = getpass.getpass(prompt='Mot de passe: ', stream=None)
-        mdp_valide = (mdp_est_conforme(mot_de_passe))[0]
-        if not mdp_valide:
-            print((mdp_est_conforme(mot_de_passe))[1])
+    print("Entrez un mot de passe")
+    mot_de_passe = input()
 
     ##creationValide = verifierValiditeNouveauCompte(nomUsager, motDePasse)
 
@@ -79,19 +74,6 @@ def menu_principal():
             pass
         if choix == 4:
             quitter = True
-
-
-def mdp_est_conforme(mdp):
-    if not re.search(r".{6}", mdp) or re.search(r".{13}", mdp):
-        return False, "Le mot de passe doit contenir entre 6 et 12 caractères."
-    if not re.search(r".*\d.*\d.*", mdp):
-        return False, "Le mot de passe doit contenir au moins deux chiffres."
-    if not re.search(r"[A-Z]", mdp):
-        return False, "Le mot de passe doit contenir au moins une lettre majuscule."
-    if not re.search(r"[a-z]", mdp):
-        return False, "Le mot de passe doit contenir au moins une lettre minuscule."
-    return True, ""
-
 
 if __name__ == "__main__":
     action = int(choix_de_laction())

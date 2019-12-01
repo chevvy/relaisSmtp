@@ -1,6 +1,7 @@
 import smtplib, re, socket, optparse, sys
 import re
 import os
+from hashlib import sha256
 from email.mime.text import MIMEText
 
 
@@ -81,6 +82,50 @@ def liste_utilisateurs():
     (_, utilisateurs, _) = next(os.walk(os.getcwd()))
     return utilisateurs
 
+def mdp_est_conforme(mdp):
+    if re.search(r"\s", mdp):
+        return False, "Le mot de passe ne doit pas contenir d'espace ou de tabulation."
+    if not re.search(r"(\S){6}", mdp) or re.search(r"(\S){13}", mdp):
+        return False, "Le mot de passe doit contenir entre 6 et 12 caractères."
+    if not re.search(r"\S*\d\S*\d\S*", mdp):
+        return False, "Le mot de passe doit contenir au moins deux chiffres."
+    if not re.search(r"[A-Z]", mdp):
+        return False, "Le mot de passe doit contenir au moins une lettre majuscule."
+    if not re.search(r"[a-z]", mdp):
+        return False, "Le mot de passe doit contenir au moins une lettre minuscule."
+    return True, ""
+
+
+def verifier_validite_nouveau_compte(nom_utilisateur, mot_de_passe):
+    if nom_utilisateur not in liste_utilisateurs():
+        mdp_valide = (mdp_est_conforme(mot_de_passe))[0]
+        if mdp_valide:
+            mot_de_passe_hache = sha256(mot_de_passe.encode()).hexdigest()
+            os.makedirs(os.getcwd() + '/' + nom_utilisateur)
+            path_fichier_config = os.path.join(os.getcwd() + '/' + nom_utilisateur + '/' + 'config.txt')
+            fichier_config = open(path_fichier_config, "w")
+            fichier_config.write(mot_de_passe_hache)
+            fichier_config.close()
+            return "Connexion acceptée et le compte a été créé"
+        else:
+            stringRetour = (mdp_est_conforme(mot_de_passe))[1]
+            return "Connexion échouée :" + stringRetour
+
+
+def verifier_validite_compte_existant(nom_utilisateur, mot_de_passe):
+    if nom_utilisateur in liste_utilisateurs():
+        mot_de_passe_hache = sha256(mot_de_passe.encode()).hexdigest()
+        with open(os.getcwd() + '/' + nom_utilisateur + '/' + 'config.txt') as f:
+            mot_de_passe_client = f.readline()
+        if mot_de_passe_client is not None:
+            if mot_de_passe_client == mot_de_passe_hache:
+                return "Connexion acceptée"
+            else:
+                return "Connexion échouée : Le mot de passe ne correspond pas"
+    else:
+        return "Connexion échouée : Le nom d'usager n'existe pas"
+
+
 def statistiques(utilisateur):
     courriels = liste_courriels(utilisateur)
     out = "Votre dossier contient " + str(len(courriels)) + " courriels.\n"
@@ -89,8 +134,7 @@ def statistiques(utilisateur):
     out += "Liste des courriels : \n\n" + formater_courriels(courriels)
     return out
 
+
 if __name__ == "__main__":
     print(lire_courriel("XxX_L3OK1LL3R_XxX", 1))
     initialisation_serveur()
-
-##def verifierValiditeNouveauCompte():
