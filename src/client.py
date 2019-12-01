@@ -56,23 +56,23 @@ class Client(ObjetReseau):
 
         # reception et assignation des clées
         self.socket.send(self.conversion_string_to_byte(type_execution))
-        login_info = connection_utilisateur()
+        login_info = self.connection_utilisateur()
         self.socket.send(self.conversion_string_to_byte(login_info))
 
-        self.socket.listen(5)
-        while True:
-            # un client se connecte au serveur
-            # s est un nouveau socket pour interagir avec le client
-            (s, address) = self.socket.accept()
-            # affichage du nombre de connection au serveur
-
-            # Reception des logins
-            mode_action = self.socket.recv(1024).decode()
-            print(mode_action)
-
-            # TODO vérification de la validité des login des utilisateurs
-            login_info = s.recv(1024).decode()
-            print(login_info)
+        # self.socket.listen(5)
+        # while True:
+        #     # un client se connecte au serveur
+        #     # s est un nouveau socket pour interagir avec le client
+        #     (s, address) = self.socket.accept()
+        #     # affichage du nombre de connection au serveur
+        #
+        #     # Reception des logins
+        #     mode_action = self.socket.recv(1024).decode()
+        #     print(mode_action)
+        #
+        #     # TODO vérification de la validité des login des utilisateurs
+        #     login_info = s.recv(1024).decode()
+        #     print(login_info)
 
         # recepetion et assignation de la base
 
@@ -87,17 +87,13 @@ class Client(ObjetReseau):
         self.envoi_courriel("sirpat@hotmail.com", "vincentcjobin@gmail.com")
 
 
-def courriel_test():
-    envoi_courriel("sirpat@hotmail.com", "vincentcjobin@gmail.com")
-
-
-def connection_utilisateur():
-    print("Connexion de l'utilisateur")
-    print("Entrez votre nom d'usager")
-    nom_usager = input()
-    print("Entrez votre mot de passe")
-    mot_de_passe = input()
-    return nom_usager + ' ' + mot_de_passe
+    def connection_utilisateur(self):
+        print("Connexion de l'utilisateur")
+        print("Entrez votre nom d'usager")
+        nom_usager = input()
+        print("Entrez votre mot de passe")
+        mot_de_passe = input()
+        return nom_usager + ' ' + mot_de_passe
 
 
     def menu_principal(self):
