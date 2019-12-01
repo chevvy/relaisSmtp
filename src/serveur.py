@@ -70,10 +70,12 @@ def initialisation_serveur():
 #             s.send(msg.encode())
 #             email_address = s.recv(1024).decode()
 
+
 def liste_courriels(utilisateur):
     (_, _, courriels) = next(os.walk(os.getcwd() + "/" + utilisateur))
     courriels.remove("config.txt")
     return courriels
+
 
 def formater_courriels(courriels):
     courriels_formates = ""
@@ -83,15 +85,18 @@ def formater_courriels(courriels):
         compte += 1
     return courriels_formates
 
+
 def lire_courriel(utilisateur, index):
     f = open(utilisateur + "/" + liste_courriels(utilisateur)[index])
     out = f.read()
     f.close()
     return out
 
+
 def liste_utilisateurs():
     (_, utilisateurs, _) = next(os.walk(os.getcwd()))
     return utilisateurs
+
 
 def mdp_est_conforme(mdp):
     if re.search(r"\s", mdp):

@@ -57,7 +57,10 @@ class Client(ObjetReseau):
         # reception et assignation des clées
         self.socket.send(self.conversion_string_to_byte(type_execution))
         if type_execution == "creation":
-            nouveau_compte()
+            self.socket.connect(info_connexion_serveur)
+            client = Client("127.0.0.1", 1400)
+            client.nouveau_compte()
+            self.socket.send(self.conversion_string_to_byte())
         if type_execution == "connexion":
             connection_utilisateur()
 
@@ -87,15 +90,9 @@ def nouveau_compte():
     print("Menu creation de compte")
     print("Entrez un nom d'usager")
     nom_usager = input()
-    mdp_valide = False
-    while not mdp_valide:
-        print("Entrez un mot de passe")
-        mot_de_passe = getpass.getpass(prompt='Mot de passe: ', stream=None)
-        mdp_valide = (mdp_est_conforme(mot_de_passe))[0]
-        if not mdp_valide:
-            print((mdp_est_conforme(mot_de_passe))[1])
-
-    ##creationValide = verifierValiditeNouveauCompte(nomUsager, motDePasse)
+    print("Entrez un mot de passe")
+    mot_de_passe = input()
+    return nom_usager, mot_de_passe
 
 
 def connection_utilisateur():
@@ -105,8 +102,6 @@ def connection_utilisateur():
     print("Entrez votre mot de passe")
     mot_de_passe = input()
     ##connectionValide = verifierValiditeCompteExistant(nomUsager, motDePasse)
-    client = Client("127.0.0.1", 1400)
-    client.execution_client_courriel()
 
 
 def menu_principal():
@@ -127,26 +122,10 @@ def menu_principal():
         if choix == 4:
             quitter = True
 
-
-def mdp_est_conforme(mdp):
-    if re.search(r"\s", mdp):
-        return False, "Le mot de passe ne doit pas contenir d'espace ou de tabulation."
-    if not re.search(r"(\S){6}", mdp) or re.search(r"(\S){13}", mdp):
-        return False, "Le mot de passe doit contenir entre 6 et 12 caractères."
-    if not re.search(r"\S*\d\S*\d\S*", mdp):
-        return False, "Le mot de passe doit contenir au moins deux chiffres."
-    if not re.search(r"[A-Z]", mdp):
-        return False, "Le mot de passe doit contenir au moins une lettre majuscule."
-    if not re.search(r"[a-z]", mdp):
-        return False, "Le mot de passe doit contenir au moins une lettre minuscule."
-    return True, ""
-
-
 if __name__ == "__main__":
     action = int(choix_de_laction())
     if action == 1:
-        nouveau_compte()
-
+        pass
     if action == 2:
         connection_utilisateur()
 
