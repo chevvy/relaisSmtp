@@ -59,9 +59,18 @@ def initialisation_serveur():
         s.send(msg.encode())
         s.close()
 
-def liste_courriels(path):
-    (_, _, courriels) = next(os.walk(os.getcwd() + "/" + path))
+def liste_courriels(utilisateur):
+    (_, _, courriels) = next(os.walk(os.getcwd() + "/" + utilisateur))
+    courriels.remove("config.txt")
     return courriels
+
+def formater_courriels(courriels):
+    courriels_formates = ""
+    compte = 1
+    for courriel in courriels:
+        courriels_formates += str(compte) + ". " + courriel[:-4] + "\n"
+        compte += 1
+    return courriels_formates
 
 def liste_utilisateurs():
     (_, utilisateurs, _) = next(os.walk(os.getcwd()))
@@ -111,7 +120,15 @@ def verifier_validite_compte_existant(nom_utilisateur, mot_de_passe):
         return "Connexion échouée : Le nom d'usager n'existe pas"
 
 
-if __name__ == "__main__":
-    print(liste_utilisateurs())
-    initialisation_serveur()
+def statistiques(utilisateur):
+    courriels = liste_courriels(utilisateur)
+    out = "Votre dossier contient " + str(len(courriels)) + " courriels.\n"
+    taille = sum(os.path.getsize(utilisateur + "/" + f) for f in os.listdir(os.getcwd() + "/" + utilisateur))
+    out += "Votre dossier pèse " + str(taille) + " octets.\n"
+    out += "Liste des courriels : \n\n" + formater_courriels(courriels)
+    return out
 
+
+if __name__ == "__main__":
+    print(statistiques("XxX_L3OK1LL3R_XxX"))
+    initialisation_serveur()

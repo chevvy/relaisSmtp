@@ -75,7 +75,6 @@ def menu_principal():
         if choix == 4:
             quitter = True
 
-
 if __name__ == "__main__":
     action = int(choix_de_laction())
     if action == 1:
