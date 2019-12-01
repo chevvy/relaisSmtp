@@ -1,5 +1,6 @@
 import smtplib, re, socket, optparse, sys
 import re
+from hashlib import sha256
 from email.mime.text import MIMEText
 
 
@@ -59,7 +60,34 @@ def initialisation_serveur():
         s.close()
 
 
+def mdp_est_conforme(mdp):
+    if re.search(r"\s", mdp):
+        return False, "Le mot de passe ne doit pas contenir d'espace ou de tabulation."
+    if not re.search(r"(\S){6}", mdp) or re.search(r"(\S){13}", mdp):
+        return False, "Le mot de passe doit contenir entre 6 et 12 caractères."
+    if not re.search(r"\S*\d\S*\d\S*", mdp):
+        return False, "Le mot de passe doit contenir au moins deux chiffres."
+    if not re.search(r"[A-Z]", mdp):
+        return False, "Le mot de passe doit contenir au moins une lettre majuscule."
+    if not re.search(r"[a-z]", mdp):
+        return False, "Le mot de passe doit contenir au moins une lettre minuscule."
+    return True, ""
+
+
+def verifier_validite_nouveau_compte(utilisateur, mot_de_passe):
+        mdp_valide = (mdp_est_conforme(mot_de_passe))[0]
+        if not mdp_valide:
+            stringRetour = (mdp_est_conforme(mot_de_passe))[1]
+        else:
+            mot_de_passe_hache = sha256(mot_de_passe.encode()).hexdigest()
+
+
+def verifier_validite_compte_existant():
+    for utilisateurs in listeUtilisateur :
+
+
+
 if __name__ == "__main__":
     initialisation_serveur()
 
-##def verifierValiditeNouveauCompte():
+
