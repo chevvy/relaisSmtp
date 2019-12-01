@@ -49,7 +49,7 @@ def connection_utilisateur():
 
 def menu_principal():
     quitter = False
-    while (not quitter):
+    while not quitter:
         print("Menu principal")
         print("1. Consultation de courriels")
         print("2. Envoi de courriels")
