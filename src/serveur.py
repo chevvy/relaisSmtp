@@ -60,6 +60,10 @@ def initialisation_serveur():
 
 def liste_courriels(utilisateur):
     (_, _, courriels) = next(os.walk(os.getcwd() + "/" + utilisateur))
+    courriels.remove("config.txt")
+    return courriels
+
+def formater_courriels(courriels):
     courriels_formates = ""
     compte = 1
     for courriel in courriels:
@@ -67,16 +71,20 @@ def liste_courriels(utilisateur):
         compte += 1
     return courriels_formates
 
-
 def liste_utilisateurs():
     (_, utilisateurs, _) = next(os.walk(os.getcwd()))
     return utilisateurs
 
 def statistiques(utilisateur):
-    pass
+    courriels = liste_courriels(utilisateur)
+    out = "Votre dossier contient " + str(len(courriels)) + " courriels.\n"
+    taille = sum(os.path.getsize(utilisateur + "/" + f) for f in os.listdir(os.getcwd() + "/" + utilisateur))
+    out += "Votre dossier pèse " + str(taille) + " octets.\n"
+    out += "Liste des courriels : \n\n" + formater_courriels(courriels)
+    return out
 
 if __name__ == "__main__":
-    print(liste_courriels("XxX_L3OK1LL3R_XxX"))
+    print(statistiques("XxX_L3OK1LL3R_XxX"))
     initialisation_serveur()
 
 ##def verifierValiditeNouveauCompte():
