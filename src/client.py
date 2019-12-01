@@ -53,19 +53,15 @@ class Client(ObjetReseau):
     def execution_client_courriel(self, type_execution):
         info_connexion_serveur = (self.ip, self.port)
         self.socket.connect(info_connexion_serveur)
-
-        connection_utilisateur()
         # reception et assignation des clées
         self.socket.send(self.conversion_string_to_byte(type_execution))
         if type_execution == "creation":
             login_info = nouveau_compte()
 
-
         if type_execution == "connexion":
             login_info = connection_utilisateur()
 
         # recepetion et assignation de la base
-
 
         self.socket.close()
 
@@ -91,7 +87,7 @@ def nouveau_compte():
     print("Entrez un nom d'usager")
     nom_usager = input()
     print("Entrez un mot de passe")
-    mot_de_passe = getpass.getpass(prompt='Mot de passe: ', stream=None)
+    mot_de_passe = input()
     return nom_usager, mot_de_passe
 
     ##creationValide = verifierValiditeNouveauCompte(nomUsager, motDePasse)
