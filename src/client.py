@@ -59,6 +59,7 @@ class Client(ObjetReseau):
 
         if type_execution == "connexion":
             login_info = connection_utilisateur()
+            connexion_reussi = False
 
         # recepetion et assignation de la base
 

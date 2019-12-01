@@ -64,11 +64,6 @@ def initialisation_serveur():
         s.send(msg.encode())
         s.close()
 
-# def fonction pour vérifier courriels valide (si nécessaire)
-#         while not re.search(r"^[^@]+@[^@]+\.[^@]+$", email_address):
-#             msg = "Saisissez une adresse courriel valide : "
-#             s.send(msg.encode())
-#             email_address = s.recv(1024).decode()
 
 def liste_courriels(utilisateur):
     (_, _, courriels) = next(os.walk(os.getcwd() + "/" + utilisateur))
