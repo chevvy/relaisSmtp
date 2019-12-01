@@ -59,18 +59,12 @@ class Client(ObjetReseau):
         login_info = self.connection_utilisateur()
         self.socket.send(self.conversion_string_to_byte(login_info))
 
-        while True:
-            data = self.socket.recv(1024).decode()
-            if not data:
-                break
-
-        print(data)
-        validation_connexion_liste = data.split("/")
-        print(validation_connexion_liste)
-        montrer_menu = validation_connexion_liste[0]
-        message_validation = validation_connexion_liste[1]
+        data = self.socket.recv(1024).decode()
+        data_liste = data.split("/")
+        montrer_menu = data_liste[0]
+        message_validation = data_liste[1]
         print(message_validation)
-        if montrer_menu:
+        if (montrer_menu == "True"):
             self.menu_principal()
 
         self.socket.close()
