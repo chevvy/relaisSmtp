@@ -103,9 +103,9 @@ def connection_utilisateur():
     nom_usager = input()
     print("Entrez votre mot de passe")
     mot_de_passe = input()
+
+    return nom_usager, mot_de_passe
     ##connectionValide = verifierValiditeCompteExistant(nomUsager, motDePasse)
-    client = Client("127.0.0.1", 1400)
-    client.execution_client_courriel("connexion")
 
 
 def menu_principal():
@@ -147,8 +147,9 @@ if __name__ == "__main__":
     action = int(choix_de_laction())
     if action == 1:
         client = Client("127.0.0.1", 1400)
-        client.execution_client_courriel("connexion")
+        client.execution_client_courriel("creation")
 
     if action == 2:
-        connection_utilisateur()
+        client = Client("127.0.0.1", 1400)
+        client.execution_client_courriel("connexion")
 
