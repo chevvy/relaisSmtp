@@ -126,11 +126,11 @@ def liste_utilisateurs():
 
 
 def mdp_est_conforme(mdp):
-    if re.search(r"\s", mdp):
-        return False, "Le mot de passe ne doit pas contenir d'espace ou de tabulation."
-    if not re.search(r"(\S){6}", mdp) or re.search(r"(\S){13}", mdp):
+    if re.search(r" ", mdp):
+        return False, "Le mot de passe ne doit pas contenir d'espace."
+    if not re.search(r".{6}", mdp) or re.search(r".{13}", mdp):
         return False, "Le mot de passe doit contenir entre 6 et 12 caractères."
-    if not re.search(r"\S*\d\S*\d\S*", mdp):
+    if not re.search(r".*\d.*\d.*", mdp):
         return False, "Le mot de passe doit contenir au moins deux chiffres."
     if not re.search(r"[A-Z]", mdp):
         return False, "Le mot de passe doit contenir au moins une lettre majuscule."
@@ -151,8 +151,8 @@ def verifier_validite_nouveau_compte(nom_utilisateur, mot_de_passe):
             fichier_config.close()
             return "Connexion acceptée et le compte a été créé"
         else:
-            stringRetour = (mdp_est_conforme(mot_de_passe))[1]
-            return "Connexion échouée :" + stringRetour
+            string_retour = (mdp_est_conforme(mot_de_passe))[1]
+            return "Connexion échouée :" + string_retour
 
 
 def verifier_validite_compte_existant(nom_utilisateur, mot_de_passe):

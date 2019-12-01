@@ -2,7 +2,6 @@
 import smtplib
 from email.mime.text import MIMEText
 import socket
-import re
 import getpass
 
 
@@ -12,9 +11,9 @@ class ObjetReseau:
         self.port = int(p_port)
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    def read(self):
+    def read(self, buffer=1024):
         """ Lit la réponse envoyé sur le socket """
-        return self.socket.recv(1024)
+        return self.socket.recv(buffer)
 
     def write(self, data):
         print(data)
@@ -48,7 +47,8 @@ class ObjetReseau:
 
 class Client(ObjetReseau):
     def __init__(self, p_ip, p_port):
-        ObjetReseau.__init__(self, p_ip, p_port)
+        self.objet_reseau = ObjetReseau.__init__(self, p_ip, p_port)
+        self.utilisateur_courant = None
 
     def execution_client_courriel(self, type_execution):
         info_connexion_serveur = (self.ip, self.port)
@@ -80,16 +80,11 @@ class Client(ObjetReseau):
         self.socket.close()
 
 
-def envoi_courriel(expediteur, destinataire, sujet, text):
-    print("Data : ")
+    def envoi_courriel(self, expediteur, destinataire, sujet, text):
+        print("Data : ")
 
-
-def choix_de_laction():
-    print("Menu de connexion")
-    print("1. Creer un compte")
-    print("2. Se connecter")
-    choix = input()
-    return choix
+    def courriel_test(self):
+        self.envoi_courriel("sirpat@hotmail.com", "vincentcjobin@gmail.com")
 
 
 def courriel_test():
@@ -105,23 +100,33 @@ def connection_utilisateur():
     return nom_usager + ' ' + mot_de_passe
 
 
-def menu_principal():
-    quitter = False
-    while not quitter:
-        print("Menu principal")
-        print("1. Consultation de courriels")
-        print("2. Envoi de courriels")
-        print("3. Statistiques")
-        print("4. Quitter")
-        choix = input()
-        if choix == 1:
-            pass
-        if choix == 2:
-            pass
-        if choix == 3:
-            pass
-        if choix == 4:
-            quitter = True
+    def menu_principal(self):
+        quitter = False
+        while not quitter:
+            print("Menu principal")
+            print("1. Consultation de courriels")
+            print("2. Envoi de courriels")
+            print("3. Statistiques")
+            print("4. Quitter")
+            choix = input()
+            if choix == 1:
+                pass
+            if choix == 2:
+                pass
+            if choix == 3:
+                payload = ObjetReseau.conversion_string_to_byte("3" + self.utilisateur_courant)
+                self.objet_reseau.write(payload)
+                input(self.objet_reseau.read(4096))
+
+            if choix == 4:
+                quitter = True
+
+def choix_de_laction():
+    print("Menu de connexion")
+    print("1. Créer un compte")
+    print("2. Se connecter")
+    choix = input()
+    return choix
 
 if __name__ == "__main__":
 
