@@ -28,20 +28,25 @@ def initialisation_serveur():
         # affichage du nombre de connection au serveur
         i += 1
         print(str(i) + "e connexion au serveur")
+
+
+        # Reception des logins
+        mode_action = s.recv(1024).decode()
+        if mode_action == "creation":
+            print("creation")
+        if mode_action == "connexion":
+            print("connexion")
+
+        # TODO vérification de la validité des login des utilisateurs
+
         # message de bienvenue
-        msg = "Bienvenue sur le serveur fkn chill de Léo, Cathou et Vincent. \nA qui dois-je envoyer un courriel? "
-        s.send(msg.encode())
-        # reception du courriel et verification qu’il est valide
-        email_address = s.recv(1024).decode()
-        while not re.search(r"^[^@]+@[^@]+\.[^@]+$", email_address):
-            msg = "Saisissez une adresse courriel valide : "
-            s.send(msg.encode())
-            email_address = s.recv(1024).decode()
+        msg = "True"  # la connexion est reussi
+        s.send(msg.encode())  # à ce moment le client va afficher le
 
         # creation du courriel
         courriel = MIMEText("Ce courriel a ete envoye par mon serveur de courriel")
         courriel["From"] = "exercice3@glo2000.ca"
-        courriel["To"] = email_address
+        courriel["To"] = "adresse to"
         courriel["Subject"] = "Exercice3"
 
         # envoi du courriel
@@ -58,6 +63,12 @@ def initialisation_serveur():
         msg = "Au revoir!\n"
         s.send(msg.encode())
         s.close()
+
+# def fonction pour vérifier courriels valide (si nécessaire)
+#         while not re.search(r"^[^@]+@[^@]+\.[^@]+$", email_address):
+#             msg = "Saisissez une adresse courriel valide : "
+#             s.send(msg.encode())
+#             email_address = s.recv(1024).decode()
 
 def liste_courriels(utilisateur):
     (_, _, courriels) = next(os.walk(os.getcwd() + "/" + utilisateur))
