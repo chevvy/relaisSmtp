@@ -67,3 +67,4 @@ def liste_courriels(path):
 if __name__ == "__main__":
     initialisation_serveur()
 
+##def verifierValiditeNouveauCompte():
