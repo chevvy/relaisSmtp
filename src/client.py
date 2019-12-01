@@ -60,11 +60,18 @@ class Client(ObjetReseau):
         self.socket.send(self.conversion_string_to_byte(login_info))
 
         while True:
-            mode_action = self.socket.recv(1024).decode()
-            if not mode_action:
+            data = self.socket.recv(1024).decode()
+            if not data:
                 break
-            print(mode_action)
 
+        print(data)
+        validation_connexion_liste = data.split("/")
+        print(validation_connexion_liste)
+        montrer_menu = validation_connexion_liste[0]
+        message_validation = validation_connexion_liste[1]
+        print(message_validation)
+        if montrer_menu:
+            self.menu_principal()
 
         self.socket.close()
 

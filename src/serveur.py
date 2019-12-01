@@ -67,6 +67,7 @@ def initialisation_serveur():
 
         # message de bienvenue
         msg = "True" + "/" + validation  # la connexion est reussi
+        print(msg)
         s.send(msg.encode())  # à ce moment le client va afficher le
 
 def creation_du_courriel():
