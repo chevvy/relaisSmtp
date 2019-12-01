@@ -71,6 +71,12 @@ def formater_courriels(courriels):
         compte += 1
     return courriels_formates
 
+def lire_courriel(utilisateur, index):
+    f = open(utilisateur + "/" + liste_courriels(utilisateur)[index])
+    out = f.read()
+    f.close()
+    return out
+
 def liste_utilisateurs():
     (_, utilisateurs, _) = next(os.walk(os.getcwd()))
     return utilisateurs
@@ -84,7 +90,7 @@ def statistiques(utilisateur):
     return out
 
 if __name__ == "__main__":
-    print(statistiques("XxX_L3OK1LL3R_XxX"))
+    print(lire_courriel("XxX_L3OK1LL3R_XxX", 1))
     initialisation_serveur()
 
 ##def verifierValiditeNouveauCompte():
