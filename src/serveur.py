@@ -63,7 +63,7 @@ def liste_courriels(path):
     (_, _, courriels) = next(os.walk(os.getcwd() + "/" + path))
     return courriels
 
-def liste_utlisateurs():
+def liste_utilisateurs():
     (_, utilisateurs, _) = next(os.walk(os.getcwd()))
     return utilisateurs
 
@@ -81,21 +81,37 @@ def mdp_est_conforme(mdp):
     return True, ""
 
 
-def verifier_validite_nouveau_compte(utilisateur, mot_de_passe):
+def verifier_validite_nouveau_compte(nom_utilisateur, mot_de_passe):
+    if nom_utilisateur not in liste_utilisateurs():
         mdp_valide = (mdp_est_conforme(mot_de_passe))[0]
-        if not mdp_valide:
-            stringRetour = (mdp_est_conforme(mot_de_passe))[1]
-        else:
+        if mdp_valide:
             mot_de_passe_hache = sha256(mot_de_passe.encode()).hexdigest()
+            os.makedirs(os.getcwd() + '/' + nom_utilisateur)
+            path_fichier_config = os.path.join(os.getcwd() + '/' + nom_utilisateur + '/' + 'config.txt')
+            fichier_config = open(path_fichier_config, "w")
+            fichier_config.write(mot_de_passe_hache)
+            fichier_config.close()
+            return "Connexion acceptée et le compte a été créé"
+        else:
+            stringRetour = (mdp_est_conforme(mot_de_passe))[1]
+            return "Connexion échouée :" + stringRetour
 
 
-def verifier_validite_compte_existant():
-    for utilisateurs in listeUtilisateur :
-
+def verifier_validite_compte_existant(nom_utilisateur, mot_de_passe):
+    if nom_utilisateur in liste_utilisateurs():
+        mot_de_passe_hache = sha256(mot_de_passe.encode()).hexdigest()
+        with open(os.getcwd() + '/' + nom_utilisateur + '/' + 'config.txt') as f:
+            mot_de_passe_client = f.readline()
+        if mot_de_passe_client is not None:
+            if mot_de_passe_client == mot_de_passe_hache:
+                return "Connexion acceptée"
+            else:
+                return "Connexion échouée : Le mot de passe ne correspond pas"
+    else:
+        return "Connexion échouée : Le nom d'usager n'existe pas"
 
 
 if __name__ == "__main__":
-    print(liste_utlisateurs())
+    print(liste_utilisateurs())
     initialisation_serveur()
 
-##def verifierValiditeNouveauCompte():
