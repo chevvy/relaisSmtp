@@ -1,5 +1,6 @@
 import re
 
+
 def choix_de_laction():
     print("Menu de connexion")
     print("1. Creer un compte")
@@ -18,12 +19,24 @@ def connection_utilisateur():
     choix = input()
 
 
-if __name__ == "__main__":
-    action = int(choix_de_laction())
-    if action == 1:
-        nouveau_compte()
-    if action == 2:
-        connection_utilisateur()
+def menu_principal():
+    quitter = False
+    while (not quitter):
+        print("Menu principal")
+        print("1. Consultation de courriels")
+        print("2. Envoi de courriels")
+        print("3. Statistiques")
+        print("4. Quitter")
+        choix = input()
+        if choix == 1:
+            pass
+        if choix == 2:
+            pass
+        if choix == 3:
+            pass
+        if choix == 4:
+            quitter = True
+
 
 def mdp_est_conforme(mdp):
     if re.search(r"\s", mdp):
@@ -37,3 +50,11 @@ def mdp_est_conforme(mdp):
     if not re.search(r"[a-z]", mdp):
         return False, "Le mot de passe doit contenir au moins une lettre minuscule."
     return True, "ok"
+
+
+if __name__ == "__main__":
+    action = int(choix_de_laction())
+    if action == 1:
+        nouveau_compte()
+    if action == 2:
+        connection_utilisateur()
