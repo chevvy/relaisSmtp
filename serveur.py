@@ -1,5 +1,6 @@
 import smtplib, re, socket, optparse, sys
 import re
+import os
 from hashlib import sha256
 from email.mime.text import MIMEText
 
@@ -52,12 +53,16 @@ def initialisation_serveur():
             msg = "Le courriel a bien ete envoye! "
             s.send(msg.encode())
         except:
-            msg = "L’envoi n’a pas pu etre effectue. "
+            msg = "L’envoi n’a pas pu etre effectué. "
             s.send(msg.encode())
 
         msg = "Au revoir!\n"
         s.send(msg.encode())
         s.close()
+
+def liste_courriels(path):
+    (_, _, courriels) = next(os.walk(os.getcwd() + "/" + path))
+    print(courriels)
 
 
 def mdp_est_conforme(mdp):
@@ -90,4 +95,4 @@ def verifier_validite_compte_existant():
 if __name__ == "__main__":
     initialisation_serveur()
 
-
+##def verifierValiditeNouveauCompte():
