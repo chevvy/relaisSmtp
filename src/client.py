@@ -66,7 +66,6 @@ class Client(ObjetReseau):
         message_validation = data_liste[1]
         print(" message de vallidation " + message_validation)
         if montrer_menu == "True":
-
             self.menu_principal()
 
         self.socket.close()
@@ -98,16 +97,20 @@ class Client(ObjetReseau):
             print("4. Quitter")
             choix = int(input())
             if choix == 1:
-                payload = ObjetReseau.conversion_string_to_byte("1" + self.utilisateur_courant)
+                payload = ObjetReseau.conversion_string_to_byte("1")
+                self.socket.send(payload)
 
             if choix == 2:
-                payload = ObjetReseau.conversion_string_to_byte("2" + self.utilisateur_courant)
-                pass
+                payload = ObjetReseau.conversion_string_to_byte("2")
+                self.socket.send(payload)
+
             if choix == 3:
-                payload = ObjetReseau.conversion_string_to_byte("3" + self.utilisateur_courant)
-                self.objet_reseau.write(payload)
-                input(self.objet_reseau.read(4096))
+                payload = ObjetReseau.conversion_string_to_byte("3")
+                self.socket.send(payload)
+                print(self.read(4096).decode())
             if choix == 4:
+                payload = ObjetReseau.conversion_string_to_byte("4")
+                self.socket.send(payload)
                 quitter = True
 
 

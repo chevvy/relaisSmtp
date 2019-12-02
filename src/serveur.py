@@ -30,7 +30,7 @@ def conversion_string_to_byte(element_a_convertir, encodage="utf-8"):
 def initialisation_serveur():
     # choisissez le port avec l’option -p
     global validation
-    global utilisateur_courant
+    utilisateur_courant = None
     parser = optparse.OptionParser()
     parser.add_option("-p", "--port", action="store", dest="port", type=int, default=1400)
     port = parser.parse_args(sys.argv[1:])[0].port
@@ -47,6 +47,7 @@ def initialisation_serveur():
         # un client se connecte au serveur
         # s est un nouveau socket pour interagir avec le client
         (s, address) = serversocket.accept()
+        utilisateur_valide_connecte = False
         # affichage du nombre de connection au serveur
         i += 1
         print(str(i) + "e connexion au serveur")
@@ -66,13 +67,26 @@ def initialisation_serveur():
         if mode_action == "connexion":
             validation = verifier_validite_compte_existant(user_et_mdp[0], user_et_mdp[1])
 
-        utilisateur_courant = user_et_mdp[0]
+        s.send(conversion_string_to_byte(str(validation[0]) + '/' + validation[1]))  # envoi de la validation
 
-        s.send(conversion_string_to_byte(str(validation[0]) + '/' + validation[1]))
+        if validation[0]:  # utilisateur connecté
+            utilisateur_courant = user_et_mdp[0]
+            choix_user = 0
+            while choix_user != 4:
+                choix_user = s.recv(1024).decode()  # recepetion du choix de l'utilisateur
+                if choix_user != '':
+                    choix_user = int(choix_user)
+                    if choix_user == 1:
+                        print(choix_user)
+                    if choix_user == 2:
+                        print(choix_user)
+                    if choix_user == 3:
+                        stats = statistiques(utilisateur_courant)
+                        print(stats)
+                        s.send(conversion_string_to_byte(stats))
 
-        choix_user = s.recv(1024).decode()  # recepetion du choix de l'utilisateur
+        utilisateur_courant = None  # retire l'utilisateur courant
 
-        utilisateur_courant == None  # retire l'utilisateur courant
 
 
 
@@ -188,5 +202,4 @@ def statistiques(utilisateur):
 
 
 if __name__ == "__main__":
-    print(lire_courriel("XxX_L3OK1LL3R_XxX", 1))
     initialisation_serveur()
