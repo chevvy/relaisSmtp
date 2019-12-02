@@ -30,6 +30,7 @@ def conversion_string_to_byte(element_a_convertir, encodage="utf-8"):
 def initialisation_serveur():
     # choisissez le port avec l’option -p
     global validation
+    global utilisateur_courant
     parser = optparse.OptionParser()
     parser.add_option("-p", "--port", action="store", dest="port", type=int, default=1400)
     port = parser.parse_args(sys.argv[1:])[0].port
@@ -65,7 +66,15 @@ def initialisation_serveur():
         if mode_action == "connexion":
             validation = verifier_validite_compte_existant(user_et_mdp[0], user_et_mdp[1])
 
+        utilisateur_courant = user_et_mdp[0]
+
         s.send(conversion_string_to_byte(str(validation[0]) + '/' + validation[1]))
+
+        choix_user = s.recv(1024).decode()  # recepetion du choix de l'utilisateur
+
+        utilisateur_courant == None  # retire l'utilisateur courant
+
+
 
 def creation_du_courriel():
     courriel = MIMEText("Ce courriel a ete envoye par mon serveur de courriel")

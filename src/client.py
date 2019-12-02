@@ -54,28 +54,28 @@ class Client(ObjetReseau):
         info_connexion_serveur = (self.ip, self.port)
         self.socket.connect(info_connexion_serveur)
 
-        # reception et assignation des clées
-        self.socket.send(self.conversion_string_to_byte(type_execution))
-        login_info = self.connection_utilisateur()
-        self.socket.send(self.conversion_string_to_byte(login_info))
+        self.socket.send(self.conversion_string_to_byte(type_execution))  # envoi du mode dexecution
 
-        data = self.socket.recv(1024).decode()
+        login_info = self.connection_utilisateur()
+        self.socket.send(self.conversion_string_to_byte(login_info))  # envoi du login user
+
+        data = self.socket.recv(1024).decode()  # attente de la réponse du serveur pour la création/login
         data_liste = data.split("/")
+
         montrer_menu = data_liste[0]
         message_validation = data_liste[1]
-        print(message_validation)
-        if (montrer_menu == "True"):
+        print(" message de vallidation " + message_validation)
+        if montrer_menu == "True":
+
             self.menu_principal()
 
         self.socket.close()
-
 
     def envoi_courriel(self, expediteur, destinataire, sujet, text):
         print("Data : ")
 
     def courriel_test(self):
         self.envoi_courriel("sirpat@hotmail.com", "vincentcjobin@gmail.com")
-
 
     def connection_utilisateur(self):
         if action == 1:
@@ -88,7 +88,6 @@ class Client(ObjetReseau):
         mot_de_passe = input()
         return nom_usager + ' ' + mot_de_passe
 
-
     def menu_principal(self):
         quitter = False
         while not quitter:
@@ -97,18 +96,20 @@ class Client(ObjetReseau):
             print("2. Envoi de courriels")
             print("3. Statistiques")
             print("4. Quitter")
-            choix = input()
+            choix = int(input())
             if choix == 1:
-                pass
+                payload = ObjetReseau.conversion_string_to_byte("1" + self.utilisateur_courant)
+
             if choix == 2:
+                payload = ObjetReseau.conversion_string_to_byte("2" + self.utilisateur_courant)
                 pass
             if choix == 3:
                 payload = ObjetReseau.conversion_string_to_byte("3" + self.utilisateur_courant)
                 self.objet_reseau.write(payload)
                 input(self.objet_reseau.read(4096))
-
             if choix == 4:
                 quitter = True
+
 
 def choix_de_laction():
     print("Menu de connexion")
@@ -116,6 +117,7 @@ def choix_de_laction():
     print("2. Se connecter")
     choix = input()
     return choix
+
 
 if __name__ == "__main__":
 
@@ -127,4 +129,3 @@ if __name__ == "__main__":
     if action == 2:
         client = Client("127.0.0.1", 1400)
         client.execution_client_courriel("connexion")
-
