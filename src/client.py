@@ -73,8 +73,6 @@ class Client(ObjetReseau):
     def envoi_courriel(self, expediteur, destinataire, sujet, text):
         print("Data : ")
 
-    def courriel_test(self):
-        self.envoi_courriel("sirpat@hotmail.com", "vincentcjobin@gmail.com")
 
     def connection_utilisateur(self):
         if action == 1:
@@ -99,10 +97,24 @@ class Client(ObjetReseau):
             if choix == 1:
                 payload = ObjetReseau.conversion_string_to_byte("1")
                 self.socket.send(payload)
+                liste_des_courriels = self.socket.recv(1024).decode()
+                print(liste_des_courriels)
+                print("Quel courriel souhaitez-vous consulter?")
+                choix_courriel = input()
+                payload = ObjetReseau.conversion_string_to_byte(choix_courriel)
+                self.socket.send(payload)
+                courriel = self.socket.recv(1024).decode('utf-8')
+                print(courriel)
 
             if choix == 2:
                 payload = ObjetReseau.conversion_string_to_byte("2")
                 self.socket.send(payload)
+                info_courriel = recuperer_info_courriels()
+                payload = ObjetReseau.conversion_string_to_byte(info_courriel)  # envoi des infos du courriels
+                self.socket.send(payload)
+                reponse_serveur = self.socket.recv(1024).decode()
+                print(reponse_serveur)
+
 
             if choix == 3:
                 payload = ObjetReseau.conversion_string_to_byte("3")
@@ -112,6 +124,15 @@ class Client(ObjetReseau):
                 payload = ObjetReseau.conversion_string_to_byte("4")
                 self.socket.send(payload)
                 quitter = True
+
+def recuperer_info_courriels():
+    print("Entrez l'adresse du destinataire : ")
+    destinataire = input()
+    print("Entrez le sujet : ")
+    sujet = input()
+    print("Entrez le corps de votre courriel : ")
+    corps = input()
+    return destinataire + '/' + sujet + '/' + corps
 
 
 def choix_de_laction():

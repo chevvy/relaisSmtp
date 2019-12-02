@@ -77,46 +77,51 @@ def initialisation_serveur():
                 if choix_user != '':
                     choix_user = int(choix_user)
                     if choix_user == 1:
-                        print(choix_user)
+                        liste_des_courriels = (formater_courriels(liste_courriels(utilisateur_courant)))
+                        s.send(conversion_string_to_byte(liste_des_courriels))  # envoi liste des courriels
+                        courriel_desire = s.recv(1024).decode()  # choix de l'utilisateur pour le courriel
+                        courriel = lire_courriel(utilisateur_courant, int(courriel_desire))
+                        s.send(conversion_string_to_byte(courriel))
                     if choix_user == 2:
-                        print(choix_user)
+                        info_courriel = s.recv(1024).decode()
+                        info_courriel = info_courriel.split('/')
+                        courriel = creation_du_courriel(utilisateur_courant, info_courriel)
+                        envoie_du_courriel(courriel, s, utilisateur_courant)
+
+
                     if choix_user == 3:
                         stats = statistiques(utilisateur_courant)
-                        print(stats)
                         s.send(conversion_string_to_byte(stats))
 
         utilisateur_courant = None  # retire l'utilisateur courant
 
 
+def creation_du_courriel(utilisateur, info_courriel):
 
+    courriel = MIMEText(info_courriel[0])
+    courriel["From"] = utilisateur + "@superfuntimes.com"
+    courriel["To"] = info_courriel[1]
+    courriel["Subject"] = info_courriel[2]
+    return courriel
 
-def creation_du_courriel():
-    courriel = MIMEText("Ce courriel a ete envoye par mon serveur de courriel")
-    courriel["From"] = "exercice3@glo2000.ca"
-    courriel["To"] = "adresse to"
-    courriel["Subject"] = "Exercice3"
-
-
-def envoie_du_courriel(courriel, s):
-    try:
-        smtp_connection = smtplib.SMTP(host="smtp.ulaval.ca", timeout=10)
-        smtp_connection.sendmail(courriel["From"], courriel["To"], courriel.as_string())
-        smtp_connection.quit()
-        msg = "Le courriel a bien ete envoye! "
-        s.send(msg.encode())
-    except:
-        msg = "L’envoi n’a pas pu etre effectué. "
-        s.send(msg.encode())
-        msg = "Au revoir!\n"
-        s.send(msg.encode())
-        s.close()
-
-
-# def fonction pour vérifier courriels valide (si nécessaire)
-#         while not re.search(r"^[^@]+@[^@]+\.[^@]+$", email_address):
-#             msg = "Saisissez une adresse courriel valide : "
-#             s.send(msg.encode())
-#             email_address = s.recv(1024).decode()
+def envoie_du_courriel(courriel, sock, utilisateur):
+    if utilisateur in liste_utilisateurs():
+        # TODO faire un courriel local
+        msg = "courriel local pas implémenté"
+        sock.send(msg)
+    else:
+        try:
+            smtp_connection = smtplib.SMTP(host="smtp.ulaval.ca", timeout=10)
+            smtp_connection.sendmail(courriel["From"], courriel["To"], courriel.as_string())
+            smtp_connection.quit()
+            msg = "Le courriel a bien ete envoye! "
+            sock.send(msg.encode())
+        except:
+            msg = "L’envoi n’a pas pu etre effectué. "
+            sock.send(msg.encode())
+            msg = "Au revoir!\n"
+            sock.send(msg.encode())
+            sock.close()
 
 
 def liste_courriels(utilisateur):
@@ -127,7 +132,7 @@ def liste_courriels(utilisateur):
 
 def formater_courriels(courriels):
     courriels_formates = ""
-    compte = 1
+    compte = 0
     for courriel in courriels:
         courriels_formates += str(compte) + ". " + courriel[:-4] + "\n"
         compte += 1
