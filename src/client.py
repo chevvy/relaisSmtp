@@ -115,7 +115,6 @@ class Client(ObjetReseau):
                 reponse_serveur = self.socket.recv(1024).decode()
                 print(reponse_serveur)
 
-
             if choix == 3:
                 payload = ObjetReseau.conversion_string_to_byte("3")
                 self.socket.send(payload)
@@ -124,6 +123,7 @@ class Client(ObjetReseau):
                 payload = ObjetReseau.conversion_string_to_byte("4")
                 self.socket.send(payload)
                 quitter = True
+
 
 def recuperer_info_courriels():
     print("Entrez l'adresse du destinataire : ")

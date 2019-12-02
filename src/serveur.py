@@ -88,7 +88,6 @@ def initialisation_serveur():
                         courriel = creation_du_courriel(utilisateur_courant, info_courriel)
                         envoie_du_courriel(courriel, s, utilisateur_courant)
 
-
                     if choix_user == 3:
                         stats = statistiques(utilisateur_courant)
                         s.send(conversion_string_to_byte(stats))
@@ -98,17 +97,21 @@ def initialisation_serveur():
 
 def creation_du_courriel(utilisateur, info_courriel):
 
-    courriel = MIMEText(info_courriel[0])
-    courriel["From"] = utilisateur + "@superfuntimes.com"
-    courriel["To"] = info_courriel[1]
-    courriel["Subject"] = info_courriel[2]
+    courriel = MIMEText(info_courriel[2])
+    courriel["From"] = utilisateur + "@damnnnnnn.com"
+    courriel["To"] = info_courriel[0]
+    courriel["Subject"] = info_courriel[1]
     return courriel
 
 def envoie_du_courriel(courriel, sock, utilisateur):
-    if utilisateur in liste_utilisateurs():
+    destinataire = courriel["To"]
+    if destinataire in liste_utilisateurs():
         # TODO faire un courriel local
-        msg = "courriel local pas implémenté"
-        sock.send(msg)
+        # La méthode en question devra changer le dossier de travail pour celui du destinataire
+        # creer le fichier, et tout domper dessus
+        envoi_courriel_local(courriel, destinataire, utilisateur)
+        msg = "courriel envoyé ! "
+        sock.send(conversion_string_to_byte(msg))
     else:
         try:
             smtp_connection = smtplib.SMTP(host="smtp.ulaval.ca", timeout=10)
@@ -122,6 +125,19 @@ def envoie_du_courriel(courriel, sock, utilisateur):
             msg = "Au revoir!\n"
             sock.send(msg.encode())
             sock.close()
+
+
+def envoi_courriel_local(courriel, destinataire, expediteur):
+    chemin_actuel = os.getcwd()
+    sujet = courriel["Subject"]
+    os.chdir(os.getcwd() + '/' + destinataire)
+    path_fichier_courriel = os.path.join(os.getcwd() + '/' + expediteur + sujet + '.txt')
+    fichier_courriel = open(path_fichier_courriel, "w")
+    fichier_courriel.write(courriel) # TODO écrire le courriel dans le fichier ! marche pas de même ... vu que c'est MIMEtext
+    fichier_courriel.close()
+
+    os.chdir(chemin_actuel)
+
 
 
 def liste_courriels(utilisateur):
