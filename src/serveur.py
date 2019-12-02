@@ -42,10 +42,11 @@ def initialisation_serveur():
     serversocket.listen(5)
     print("Listening on port " + str(serversocket.getsockname()[1]))
     i = 0
-    while True:
-        # un client se connecte au serveur
-        # s est un nouveau socket pour interagir avec le client
-        (s, address) = serversocket.accept()
+    # un client se connecte au serveur
+    # s est un nouveau socket pour interagir avec le client
+    (s, address) = serversocket.accept()
+    connexion_invalide = True
+    while connexion_invalide:
         # affichage du nombre de connection au serveur
         i += 1
         print(str(i) + "e connexion au serveur")
@@ -55,6 +56,7 @@ def initialisation_serveur():
         print(mode_action)
 
         # TODO vérification de la validité des login des utilisateurs
+
         login_info = s.recv(1024).decode()
         print(login_info)
         user_et_mdp = login_info.split(" ")
@@ -66,6 +68,17 @@ def initialisation_serveur():
             validation = verifier_validite_compte_existant(user_et_mdp[0], user_et_mdp[1])
 
         s.send(conversion_string_to_byte(str(validation[0]) + '/' + validation[1]))
+
+        message_recu = s.recv(1024).decode()
+        if message_recu == "creation" or message_recu == "connexion":
+            connexion_invalide = True
+        else:
+            connexion_invalide = False
+
+
+
+
+
 
 def creation_du_courriel():
     courriel = MIMEText("Ce courriel a ete envoye par mon serveur de courriel")
@@ -150,7 +163,7 @@ def verifier_validite_nouveau_compte(nom_utilisateur, mot_de_passe):
             return True, "Connexion acceptée et le compte a été créé"
         else:
             string_retour = (mdp_est_conforme(mot_de_passe))[1]
-            return False, "Connexion échouée :" + string_retour
+            return False, "Connexion échouée : " + string_retour
 
 
 def verifier_validite_compte_existant(nom_utilisateur, mot_de_passe):
