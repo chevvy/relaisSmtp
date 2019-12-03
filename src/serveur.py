@@ -3,6 +3,7 @@ import re
 import os
 from hashlib import sha256
 from email.mime.text import MIMEText
+from email.parser import Parser
 
 
 def conversion_byte_to_string(byte_a_convertir, encodage="utf-8"):
@@ -86,7 +87,7 @@ def initialisation_serveur():
                         info_courriel = s.recv(1024).decode()
                         info_courriel = info_courriel.split('/')
                         courriel = creation_du_courriel(utilisateur_courant, info_courriel)
-                        envoie_du_courriel(courriel, s, utilisateur_courant)
+                        envoie_du_courriel(courriel, s, utilisateur_courant, info_courriel[2])
 
                     if choix_user == 3:
                         stats = statistiques(utilisateur_courant)
@@ -103,13 +104,13 @@ def creation_du_courriel(utilisateur, info_courriel):
     courriel["Subject"] = info_courriel[1]
     return courriel
 
-def envoie_du_courriel(courriel, sock, utilisateur):
+def envoie_du_courriel(courriel, sock, utilisateur, corps):
     destinataire = courriel["To"]
     if destinataire in liste_utilisateurs():
         # TODO faire un courriel local
         # La méthode en question devra changer le dossier de travail pour celui du destinataire
         # creer le fichier, et tout domper dessus
-        envoi_courriel_local(courriel, destinataire, utilisateur)
+        envoi_courriel_local(courriel, destinataire, utilisateur, corps)
         msg = "courriel envoyé ! "
         sock.send(conversion_string_to_byte(msg))
     else:
@@ -127,13 +128,13 @@ def envoie_du_courriel(courriel, sock, utilisateur):
             sock.close()
 
 
-def envoi_courriel_local(courriel, destinataire, expediteur):
+def envoi_courriel_local(courriel, destinataire, expediteur, corps):
     chemin_actuel = os.getcwd()
     sujet = courriel["Subject"]
     os.chdir(os.getcwd() + '/' + destinataire)
     path_fichier_courriel = os.path.join(os.getcwd() + '/' + expediteur + sujet + '.txt')
     fichier_courriel = open(path_fichier_courriel, "w")
-    fichier_courriel.write(courriel) # TODO écrire le courriel dans le fichier ! marche pas de même ... vu que c'est MIMEtext
+    fichier_courriel.write(corps)
     fichier_courriel.close()
 
     os.chdir(chemin_actuel)
