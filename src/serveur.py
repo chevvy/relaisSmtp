@@ -29,7 +29,7 @@ def conversion_string_to_byte(element_a_convertir, encodage="utf-8"):
 
 def initialisation_serveur():
     # choisissez le port avec l’option -p
-    global validation
+    global validation, user_et_mdp
     utilisateur_courant = None
     parser = optparse.OptionParser()
     parser.add_option("-p", "--port", action="store", dest="port", type=int, default=1400)
@@ -46,75 +46,56 @@ def initialisation_serveur():
     while True:
         # un client se connecte au serveur
         # s est un nouveau socket pour interagir avec le client
-        (s, address) = serversocket.accept()
         utilisateur_valide_connecte = False
-    # un client se connecte au serveur
-    # s est un nouveau socket pour interagir avec le client
-    (s, address) = serversocket.accept()
-    connexion_invalide = True
-    while connexion_invalide:
-        # affichage du nombre de connection au serveur
-        i += 1
-        print(str(i) + "e connexion au serveur")
+        (s, address) = serversocket.accept()
+        connexion_invalide = True
+        while connexion_invalide:
+            # affichage du nombre de connection au serveur
+            i += 1
+            print(str(i) + "e connexion au serveur")
 
-        # Reception des logins
-        mode_action = s.recv(1024).decode()
-        print(mode_action)
+            # Reception des logins
+            mode_action = s.recv(1024).decode()
 
-        # TODO vérification de la validité des login des utilisateurs
-        login_info = s.recv(1024).decode()
-        print(login_info)
-        user_et_mdp = login_info.split(" ")
-        print(user_et_mdp)
-        if mode_action == "creation":
-            validation = verifier_validite_nouveau_compte(user_et_mdp[0], user_et_mdp[1])
+            login_info = s.recv(1024).decode()
+            user_et_mdp = login_info.split(" ")
+            if mode_action == "creation":
+                validation = verifier_validite_nouveau_compte(user_et_mdp[0], user_et_mdp[1])
 
-        if mode_action == "connexion":
-            validation = verifier_validite_compte_existant(user_et_mdp[0], user_et_mdp[1])
+            if mode_action == "connexion":
+                validation = verifier_validite_compte_existant(user_et_mdp[0], user_et_mdp[1])
 
-        s.send(conversion_string_to_byte(str(validation[0]) + '/' + validation[1]))  # envoi de la validation
+            s.send(conversion_string_to_byte(str(validation[0]) + '/' + validation[1]))  # envoi de la validation
 
-        if validation[0]:  # utilisateur connecté
-            utilisateur_courant = user_et_mdp[0]
-            choix_user = 0
-            while choix_user != 4:
-                choix_user = s.recv(1024).decode()  # recepetion du choix de l'utilisateur
-                if choix_user != '':
-                    choix_user = int(choix_user)
-                    if choix_user == 1:
-                        liste_des_courriels = (formater_courriels(liste_courriels(utilisateur_courant)))
-                        s.send(conversion_string_to_byte(liste_des_courriels))  # envoi liste des courriels
-                        courriel_desire = s.recv(1024).decode()  # choix de l'utilisateur pour le courriel
-                        courriel = lire_courriel(utilisateur_courant, int(courriel_desire))
-                        s.send(conversion_string_to_byte(courriel))
-                    if choix_user == 2:
-                        info_courriel = s.recv(1024).decode()
-                        info_courriel = info_courriel.split('/')
-                        courriel = creation_du_courriel(utilisateur_courant, info_courriel)
-                        envoie_du_courriel(courriel, s, utilisateur_courant)
+            if validation[0]:  # utilisateur connecté
+                connexion_invalide = False
+            else:
+                connexion_invalide = True
 
-                    if choix_user == 3:
-                        stats = statistiques(utilisateur_courant)
-                        s.send(conversion_string_to_byte(stats))
+        utilisateur_courant = user_et_mdp[0]
+        choix_user = 0
+        while choix_user != 4:
+            choix_user = s.recv(1024).decode()  # recepetion du choix de l'utilisateur
+            if choix_user != '':
+                choix_user = int(choix_user)
+                if choix_user == 1:
+                    liste_des_courriels = (formater_courriels(liste_courriels(utilisateur_courant)))
+                    s.send(conversion_string_to_byte(liste_des_courriels))  # envoi liste des courriels
+                    courriel_desire = s.recv(1024).decode()  # choix de l'utilisateur pour le courriel
+                    courriel = lire_courriel(utilisateur_courant, int(courriel_desire))
+                    s.send(conversion_string_to_byte(courriel))
+                if choix_user == 2:
+                    info_courriel = s.recv(1024).decode()
+                    info_courriel = info_courriel.split('/')
+                    courriel = creation_du_courriel(utilisateur_courant, info_courriel)
+                    envoie_du_courriel(courriel, s, utilisateur_courant)
+
+                if choix_user == 3:
+                    stats = statistiques(utilisateur_courant)
+                    s.send(conversion_string_to_byte(stats))
 
         utilisateur_courant = None  # retire l'utilisateur courant
 
-        message_recu = s.recv(1024).decode()
-        if message_recu == "creation" or message_recu == "connexion":
-            connexion_invalide = True
-        else:
-            connexion_invalide = False
-
-
-
-
-
-
-def creation_du_courriel():
-    courriel = MIMEText("Ce courriel a ete envoye par mon serveur de courriel")
-    courriel["From"] = "exercice3@glo2000.ca"
-    courriel["To"] = "adresse to"
-    courriel["Subject"] = "Exercice3"
 
 def creation_du_courriel(utilisateur, info_courriel):
 
@@ -123,6 +104,7 @@ def creation_du_courriel(utilisateur, info_courriel):
     courriel["To"] = info_courriel[0]
     courriel["Subject"] = info_courriel[1]
     return courriel
+
 
 def envoie_du_courriel(courriel, sock, utilisateur):
     destinataire = courriel["To"]
@@ -158,7 +140,6 @@ def envoi_courriel_local(courriel, destinataire, expediteur):
     fichier_courriel.close()
 
     os.chdir(chemin_actuel)
-
 
 
 def liste_courriels(utilisateur):
