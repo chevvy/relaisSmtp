@@ -113,8 +113,8 @@ def envoie_du_courriel(courriel, sock, utilisateur, corps):
     destinataire = (courriel["To"]).split("@")[0]
     domaine_destinataire = (courriel["To"]).split("@")[1]
     print(domaine_destinataire)
-    if domaine_destinataire != "glo2000.ca":
-        if destinataire in liste_utilisateurs():
+    if domaine_destinataire == "glo2000.ca":
+        if destinataire not in liste_utilisateurs():
             destinataire = "ERREUR"
         # La méthode en question devra changer le dossier de travail pour celui du destinataire
         # creer le fichier, et tout domper dessus
