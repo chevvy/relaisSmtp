@@ -73,10 +73,6 @@ class Client(ObjetReseau):
 
         self.socket.close()
 
-    def envoi_courriel(self, expediteur, destinataire, sujet, text):
-        print("Data : ")
-
-
     def connection_utilisateur(self):
         if action == 1:
             print("Création d'un compte")
@@ -102,12 +98,13 @@ class Client(ObjetReseau):
                 self.socket.send(payload)
                 liste_des_courriels = self.socket.recv(1024).decode()
                 print(liste_des_courriels)
-                print("Quel courriel souhaitez-vous consulter?")
-                choix_courriel = input()
-                payload = ObjetReseau.conversion_string_to_byte(choix_courriel)
-                self.socket.send(payload)
-                courriel = self.socket.recv(1024).decode('utf-8')
-                print(courriel)
+                if liste_des_courriels != "La boîte de courriel ne contient pas de courriel":
+                    print("Quel courriel souhaitez-vous consulter?")
+                    choix_courriel = input()
+                    payload = ObjetReseau.conversion_string_to_byte(choix_courriel)
+                    self.socket.send(payload)
+                    courriel = self.socket.recv(1024).decode('utf-8')
+                    print(courriel)
 
             if choix == 2:
                 payload = ObjetReseau.conversion_string_to_byte("2")

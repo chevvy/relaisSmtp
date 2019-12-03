@@ -80,10 +80,13 @@ def initialisation_serveur():
                 choix_user = int(choix_user)
                 if choix_user == 1:
                     liste_des_courriels = (formater_courriels(liste_courriels(utilisateur_courant)))
-                    s.send(conversion_string_to_byte(liste_des_courriels))  # envoi liste des courriels
-                    courriel_desire = s.recv(1024).decode()  # choix de l'utilisateur pour le courriel
-                    courriel = lire_courriel(utilisateur_courant, int(courriel_desire))
-                    s.send(conversion_string_to_byte(courriel))
+                    if len(liste_des_courriels) != 0:
+                        s.send(conversion_string_to_byte(liste_des_courriels))  # envoi liste des courriels
+                        courriel_desire = s.recv(1024).decode()  # choix de l'utilisateur pour le courriel
+                        courriel = lire_courriel(utilisateur_courant, int(courriel_desire))
+                        s.send(conversion_string_to_byte(courriel))
+                    else:
+                        s.send(conversion_string_to_byte("La boîte de courriel ne contient pas de courriel"))
                 if choix_user == 2:
                     info_courriel = s.recv(1024).decode()
                     info_courriel = info_courriel.split('/')
@@ -100,15 +103,21 @@ def initialisation_serveur():
 def creation_du_courriel(utilisateur, info_courriel):
 
     courriel = MIMEText(info_courriel[2])
-    courriel["From"] = utilisateur + "@glo2000.ca"
+    courriel["From"] = utilisateur + "@damnnnnnn.com"
     courriel["To"] = info_courriel[0]
     courriel["Subject"] = info_courriel[1]
     return courriel
 
 
 def envoie_du_courriel(courriel, sock, utilisateur, corps):
-    destinataire = courriel["To"]
-    if destinataire in liste_utilisateurs():
+    destinataire = (courriel["To"]).split("@")[0]
+    domaine_destinataire = (courriel["To"]).split("@")[1]
+    print(domaine_destinataire)
+    if domaine_destinataire != "glo2000.ca":
+        if destinataire in liste_utilisateurs():
+            destinataire = "ERREUR"
+        # La méthode en question devra changer le dossier de travail pour celui du destinataire
+        # creer le fichier, et tout domper dessus
         envoi_courriel_local(courriel, destinataire, utilisateur, corps)
         msg = "courriel envoyé ! "
         sock.send(conversion_string_to_byte(msg))
@@ -128,15 +137,14 @@ def envoie_du_courriel(courriel, sock, utilisateur, corps):
 
 
 def envoi_courriel_local(courriel, destinataire, expediteur, corps):
-    chemin_actuel = os.getcwd()
-    sujet = courriel["Subject"]
-    os.chdir(os.getcwd() + '/' + destinataire)
-    path_fichier_courriel = os.path.join(os.getcwd() + '/' + expediteur + " - " + sujet + '.txt')
-    fichier_courriel = open(path_fichier_courriel, "w")
-    fichier_courriel.write(corps)
-    fichier_courriel.close()
-
-    os.chdir(chemin_actuel)
+        chemin_actuel = os.getcwd()
+        sujet = courriel["Subject"]
+        os.chdir(os.getcwd() + '/' + destinataire)
+        path_fichier_courriel = os.path.join(os.getcwd() + '/' + expediteur + " " + sujet + '.txt')
+        fichier_courriel = open(path_fichier_courriel, "w")
+        fichier_courriel.write(corps)
+        fichier_courriel.close()
+        os.chdir(chemin_actuel)
 
 
 def liste_courriels(utilisateur):
@@ -194,6 +202,8 @@ def verifier_validite_nouveau_compte(nom_utilisateur, mot_de_passe):
         else:
             string_retour = (mdp_est_conforme(mot_de_passe))[1]
             return False, "Connexion échouée : " + string_retour
+    else:
+        return False, "Connexion échouée : L'utilisateur existe déjà"
 
 
 def verifier_validite_compte_existant(nom_utilisateur, mot_de_passe):
