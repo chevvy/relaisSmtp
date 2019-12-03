@@ -30,6 +30,7 @@ def conversion_string_to_byte(element_a_convertir, encodage="utf-8"):
 def initialisation_serveur():
     # choisissez le port avec l’option -p
     global validation
+    utilisateur_courant = None
     parser = optparse.OptionParser()
     parser.add_option("-p", "--port", action="store", dest="port", type=int, default=1400)
     port = parser.parse_args(sys.argv[1:])[0].port
@@ -42,6 +43,11 @@ def initialisation_serveur():
     serversocket.listen(5)
     print("Listening on port " + str(serversocket.getsockname()[1]))
     i = 0
+    while True:
+        # un client se connecte au serveur
+        # s est un nouveau socket pour interagir avec le client
+        (s, address) = serversocket.accept()
+        utilisateur_valide_connecte = False
     # un client se connecte au serveur
     # s est un nouveau socket pour interagir avec le client
     (s, address) = serversocket.accept()
@@ -56,7 +62,6 @@ def initialisation_serveur():
         print(mode_action)
 
         # TODO vérification de la validité des login des utilisateurs
-
         login_info = s.recv(1024).decode()
         print(login_info)
         user_et_mdp = login_info.split(" ")
@@ -67,7 +72,32 @@ def initialisation_serveur():
         if mode_action == "connexion":
             validation = verifier_validite_compte_existant(user_et_mdp[0], user_et_mdp[1])
 
-        s.send(conversion_string_to_byte(str(validation[0]) + '/' + validation[1]))
+        s.send(conversion_string_to_byte(str(validation[0]) + '/' + validation[1]))  # envoi de la validation
+
+        if validation[0]:  # utilisateur connecté
+            utilisateur_courant = user_et_mdp[0]
+            choix_user = 0
+            while choix_user != 4:
+                choix_user = s.recv(1024).decode()  # recepetion du choix de l'utilisateur
+                if choix_user != '':
+                    choix_user = int(choix_user)
+                    if choix_user == 1:
+                        liste_des_courriels = (formater_courriels(liste_courriels(utilisateur_courant)))
+                        s.send(conversion_string_to_byte(liste_des_courriels))  # envoi liste des courriels
+                        courriel_desire = s.recv(1024).decode()  # choix de l'utilisateur pour le courriel
+                        courriel = lire_courriel(utilisateur_courant, int(courriel_desire))
+                        s.send(conversion_string_to_byte(courriel))
+                    if choix_user == 2:
+                        info_courriel = s.recv(1024).decode()
+                        info_courriel = info_courriel.split('/')
+                        courriel = creation_du_courriel(utilisateur_courant, info_courriel)
+                        envoie_du_courriel(courriel, s, utilisateur_courant)
+
+                    if choix_user == 3:
+                        stats = statistiques(utilisateur_courant)
+                        s.send(conversion_string_to_byte(stats))
+
+        utilisateur_courant = None  # retire l'utilisateur courant
 
         message_recu = s.recv(1024).decode()
         if message_recu == "creation" or message_recu == "connexion":
@@ -86,27 +116,49 @@ def creation_du_courriel():
     courriel["To"] = "adresse to"
     courriel["Subject"] = "Exercice3"
 
+def creation_du_courriel(utilisateur, info_courriel):
 
-def envoie_du_courriel(courriel, s):
-    try:
-        smtp_connection = smtplib.SMTP(host="smtp.ulaval.ca", timeout=10)
-        smtp_connection.sendmail(courriel["From"], courriel["To"], courriel.as_string())
-        smtp_connection.quit()
-        msg = "Le courriel a bien ete envoye! "
-        s.send(msg.encode())
-    except:
-        msg = "L’envoi n’a pas pu etre effectué. "
-        s.send(msg.encode())
-        msg = "Au revoir!\n"
-        s.send(msg.encode())
-        s.close()
+    courriel = MIMEText(info_courriel[2])
+    courriel["From"] = utilisateur + "@damnnnnnn.com"
+    courriel["To"] = info_courriel[0]
+    courriel["Subject"] = info_courriel[1]
+    return courriel
+
+def envoie_du_courriel(courriel, sock, utilisateur):
+    destinataire = courriel["To"]
+    if destinataire in liste_utilisateurs():
+        # TODO faire un courriel local
+        # La méthode en question devra changer le dossier de travail pour celui du destinataire
+        # creer le fichier, et tout domper dessus
+        envoi_courriel_local(courriel, destinataire, utilisateur)
+        msg = "courriel envoyé ! "
+        sock.send(conversion_string_to_byte(msg))
+    else:
+        try:
+            smtp_connection = smtplib.SMTP(host="smtp.ulaval.ca", timeout=10)
+            smtp_connection.sendmail(courriel["From"], courriel["To"], courriel.as_string())
+            smtp_connection.quit()
+            msg = "Le courriel a bien ete envoye! "
+            sock.send(msg.encode())
+        except:
+            msg = "L’envoi n’a pas pu etre effectué. "
+            sock.send(msg.encode())
+            msg = "Au revoir!\n"
+            sock.send(msg.encode())
+            sock.close()
 
 
-# def fonction pour vérifier courriels valide (si nécessaire)
-#         while not re.search(r"^[^@]+@[^@]+\.[^@]+$", email_address):
-#             msg = "Saisissez une adresse courriel valide : "
-#             s.send(msg.encode())
-#             email_address = s.recv(1024).decode()
+def envoi_courriel_local(courriel, destinataire, expediteur):
+    chemin_actuel = os.getcwd()
+    sujet = courriel["Subject"]
+    os.chdir(os.getcwd() + '/' + destinataire)
+    path_fichier_courriel = os.path.join(os.getcwd() + '/' + expediteur + sujet + '.txt')
+    fichier_courriel = open(path_fichier_courriel, "w")
+    fichier_courriel.write(courriel) # TODO écrire le courriel dans le fichier ! marche pas de même ... vu que c'est MIMEtext
+    fichier_courriel.close()
+
+    os.chdir(chemin_actuel)
+
 
 
 def liste_courriels(utilisateur):
@@ -117,7 +169,7 @@ def liste_courriels(utilisateur):
 
 def formater_courriels(courriels):
     courriels_formates = ""
-    compte = 1
+    compte = 0
     for courriel in courriels:
         courriels_formates += str(compte) + ". " + courriel[:-4] + "\n"
         compte += 1
@@ -192,5 +244,4 @@ def statistiques(utilisateur):
 
 
 if __name__ == "__main__":
-    print(lire_courriel("XxX_L3OK1LL3R_XxX", 1))
     initialisation_serveur()
