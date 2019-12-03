@@ -103,7 +103,7 @@ def initialisation_serveur():
 def creation_du_courriel(utilisateur, info_courriel):
 
     courriel = MIMEText(info_courriel[2])
-    courriel["From"] = utilisateur + "@damnnnnnn.com"
+    courriel["From"] = utilisateur + "@glo2000.ca"
     courriel["To"] = info_courriel[0]
     courriel["Subject"] = info_courriel[1]
     return courriel
