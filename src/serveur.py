@@ -100,17 +100,15 @@ def initialisation_serveur():
 def creation_du_courriel(utilisateur, info_courriel):
 
     courriel = MIMEText(info_courriel[2])
-    courriel["From"] = utilisateur + "@damnnnnnn.com"
+    courriel["From"] = utilisateur + "@glo2000.ca"
     courriel["To"] = info_courriel[0]
     courriel["Subject"] = info_courriel[1]
     return courriel
 
+
 def envoie_du_courriel(courriel, sock, utilisateur, corps):
     destinataire = courriel["To"]
     if destinataire in liste_utilisateurs():
-        # TODO faire un courriel local
-        # La méthode en question devra changer le dossier de travail pour celui du destinataire
-        # creer le fichier, et tout domper dessus
         envoi_courriel_local(courriel, destinataire, utilisateur, corps)
         msg = "courriel envoyé ! "
         sock.send(conversion_string_to_byte(msg))
@@ -133,7 +131,7 @@ def envoi_courriel_local(courriel, destinataire, expediteur, corps):
     chemin_actuel = os.getcwd()
     sujet = courriel["Subject"]
     os.chdir(os.getcwd() + '/' + destinataire)
-    path_fichier_courriel = os.path.join(os.getcwd() + '/' + expediteur + sujet + '.txt')
+    path_fichier_courriel = os.path.join(os.getcwd() + '/' + expediteur + " - " + sujet + '.txt')
     fichier_courriel = open(path_fichier_courriel, "w")
     fichier_courriel.write(corps)
     fichier_courriel.close()
