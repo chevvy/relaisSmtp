@@ -88,7 +88,7 @@ def initialisation_serveur():
                     info_courriel = s.recv(1024).decode()
                     info_courriel = info_courriel.split('/')
                     courriel = creation_du_courriel(utilisateur_courant, info_courriel)
-                    envoie_du_courriel(courriel, s, utilisateur_courant)
+                    envoie_du_courriel(courriel, s, utilisateur_courant, info_courriel[2])
 
                 if choix_user == 3:
                     stats = statistiques(utilisateur_courant)
