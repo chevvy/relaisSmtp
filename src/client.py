@@ -51,22 +51,25 @@ class Client(ObjetReseau):
         self.utilisateur_courant = None
 
     def execution_client_courriel(self, type_execution):
+        connexion_invalide = True
         info_connexion_serveur = (self.ip, self.port)
         self.socket.connect(info_connexion_serveur)
+        while connexion_invalide:
+            # reception et assignation des clées
+            self.socket.send(self.conversion_string_to_byte(type_execution))
+            login_info = self.connection_utilisateur()
+            self.socket.send(self.conversion_string_to_byte(login_info))
 
-        self.socket.send(self.conversion_string_to_byte(type_execution))  # envoi du mode dexecution
-
-        login_info = self.connection_utilisateur()
-        self.socket.send(self.conversion_string_to_byte(login_info))  # envoi du login user
-
-        data = self.socket.recv(1024).decode()  # attente de la réponse du serveur pour la création/login
-        data_liste = data.split("/")
-
-        montrer_menu = data_liste[0]
-        message_validation = data_liste[1]
-        print(" message de vallidation " + message_validation)
-        if montrer_menu == "True":
-            self.menu_principal()
+            data = self.socket.recv(1024).decode()
+            data_liste = data.split("/")
+            montrer_menu = data_liste[0]
+            message_validation = data_liste[1]
+            print(message_validation)
+            if montrer_menu == "True":
+                self.menu_principal()
+                connexion_invalide = False
+            else:
+                connexion_invalide = True
 
         self.socket.close()
 
